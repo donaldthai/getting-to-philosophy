@@ -1,0 +1,65 @@
+@import classes.Url
+@(message: String, style: String = "java", form: Form[Url], result: String, initPaths: List[InitialPath])
+
+@defining(play.core.PlayVersion.current) { version =>
+
+    <section id="top">
+        <div class="wrapper">
+            <h1><a href="https://playframework.com/documentation/@version/Home">@message</a></h1>
+        </div>
+    </section>
+
+    <div id="content" class="wrapper doc">
+        <article>
+
+            <h1>This is built using the Play! framework.</h1>
+
+            <p>
+                Getting to Philosophy!
+                Some Wikipedia links are case-sensitive so we'll consider links as is.
+                Rules that our crawler is following:
+            </p>
+            <ul>
+                <li>Clicking on the first non-parenthesized, non-italicized link</li>
+                <li>Ignoring external links, links to the current page, or red links (links to non-existent pages)</li>
+                <li>Stopping when reaching "Philosophy", a page with no links or a page that does not exist, or when a loop occurs</li>
+            </ul>
+            <p>
+                Notes:
+                Noticed that Xfer's site has a slight different when traversing the first links.
+                Xfer's site actually goes to the next link if current link has been visited.
+                Decided to follow the rules defined in the Getting to Philosophy article. So we
+                actually stop traversing if we come across a link we've seen before to prevent loops.
+            </p>
+
+            @helper.form(routes.PhilController.GetToPhil()) {
+                @helper.CSRF.formField
+
+                @helper.inputText(form("url"), '_label -> "Wikipedia URL")
+
+                <button type="submit">Submit</button>
+            }
+
+            <p>
+                @if(result != null) {
+                    <p>
+                        Looks like you got some results! If you don't see philosophy at the end, that usually means
+                        there was a loop so we stopped crawling!
+                    </p>
+                    @result
+                }
+            </p>
+
+        </article>
+
+        <aside>
+            <h3>All Initial Wikipedia Articles You Tried!</h3>
+            <ul>
+                @for(ip <- initPaths){
+                    <li>  > @ip.title</li>
+                }
+            </ul>
+        </aside>
+
+    </div>
+}
